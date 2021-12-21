@@ -44,7 +44,7 @@ AS_CASE(
 	[$host],
 	[alpha*-*-linux*],[CFLAGS="$CFLAGS -mcpu=ev4 -Wa,-mall"],
 	[x86_64-*-linux*],[CHECK_M32="yes" CFLAGS="$CFLAGS -ffast-math -funroll-loops -fomit-frame-pointer -fexpensive-optimizations"],
-	[*-linux*],[CFLAGS="$CFLAGS -ffast-math -funroll-loops -fomit-frame-pointer -fexpensive-optimizations"],
+	[*-linux*],[CFLAGS="$CFLAGS"],
 	AC_MSG_ERROR(["Unrecognized platform $host."]))
 
 #AS_IF([test "$CHECK_M32" = "yes"],
