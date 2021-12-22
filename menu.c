@@ -283,6 +283,7 @@ void M_Menu_Main_f (void)
 		cls.demonum = -1;
 	}
 	key_dest = key_menu;
+	VID_SetMouse(true);
 	m_state = m_main;
 	m_entersound = true;
 }
@@ -309,6 +310,7 @@ void M_Main_Key (int key)
 	switch (key)
 	{
 	case K_ESCAPE:
+		VID_SetMouse(false);
 		key_dest = key_game;
 		m_state = m_none;
 		cls.demonum = m_save_demonum;

@@ -20,6 +20,7 @@ byte    *VGA_pagebase;
 static SDL_Surface *screen = NULL;
 
 static qboolean mouse_avail;
+static qboolean windowed_mode = false;
 static float   mouse_x, mouse_y;
 static int mouse_oldbuttonstate = 0;
 
@@ -44,6 +45,14 @@ void    VID_SetPalette (unsigned char *palette)
 void    VID_ShiftPalette (unsigned char *palette)
 {
     VID_SetPalette(palette);
+}
+
+void    VID_SetMouse(qboolean show)
+{
+    if (!windowed_mode && show)
+        return;
+    SDL_ShowCursor(show);
+    SDL_WM_GrabInput(show ? SDL_GRAB_OFF : SDL_GRAB_ON);
 }
 
 void    VID_Init (unsigned char *palette)
@@ -98,6 +107,7 @@ void    VID_Init (unsigned char *palette)
 
     if ( COM_CheckParm ("-window") ) {
         flags &= ~SDL_FULLSCREEN;
+        windowed_mode = true;
     }
 
     // Initialize display 
@@ -132,7 +142,7 @@ void    VID_Init (unsigned char *palette)
     D_InitCaches (cache, cachesize);
 
     // initialize the mouse
-    SDL_ShowCursor(0);
+    VID_SetMouse(windowed_mode);
 }
 
 void    VID_Shutdown (void)
@@ -312,17 +322,19 @@ void Sys_SendKeyEvents(void)
                 break;
 
             case SDL_MOUSEMOTION:
+                    mouse_x = event.motion.xrel*15;
+                    mouse_y = event.motion.yrel*15;
+#if 0
                 if ( (event.motion.x != (vid.width/2)) ||
                      (event.motion.y != (vid.height/2)) ) {
-                    mouse_x = event.motion.xrel*10;
-                    mouse_y = event.motion.yrel*10;
                     if ( (event.motion.x < ((vid.width/2)-(vid.width/4))) ||
                          (event.motion.x > ((vid.width/2)+(vid.width/4))) ||
                          (event.motion.y < ((vid.height/2)-(vid.height/4))) ||
                          (event.motion.y > ((vid.height/2)+(vid.height/4))) ) {
-                        SDL_WarpMouse(vid.width/2, vid.height/2);
+                        // SDL_WarpMouse(vid.width/2, vid.height/2);
                     }
                 }
+#endif
                 break;
 
             case SDL_QUIT:
