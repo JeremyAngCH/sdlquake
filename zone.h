@@ -84,6 +84,10 @@ Zone block
 */
 
 void Memory_Init (void *buf, int size);
+void Memory_Cleanup (void);
+
+void *Z_NoZoneTagMalloc (int size, int tag);
+void Z_NoZoneTagFree (void *ptr);
 
 void Z_Free (void *ptr);
 void *Z_Malloc (int size);			// returns 0 filled memory

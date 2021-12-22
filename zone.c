@@ -261,6 +261,40 @@ void Z_CheckHeap (void)
 	}
 }
 
+void *Z_NoZoneTagMalloc (int size, int tag)
+{
+	int		extra;
+	memblock_t	*base;
+
+	if (!tag)
+		Sys_Error ("Z_TagMalloc: tried to use a 0 tag");
+
+//
+// scan through the block list looking for the first free block
+// of sufficient size
+//
+	size += sizeof(memblock_t);	// account for size of block header
+	size += 4;					// space for memory trash tester
+	size = (size + 7) & ~7;		// align to 8-byte boundary
+
+	base = (memblock_t *)malloc(size);
+
+	base->tag = tag;
+	base->size = size;
+	base->id = ZONEID;
+
+// marker for memory trash testing
+	*(int *)((byte *)base + base->size - 4) = ZONEID;
+
+	return (void *) ((byte *)base + sizeof(memblock_t));
+}
+
+void Z_NoZoneTagFree (void *ptr)
+{
+	if (ptr)
+		free(ptr - sizeof (memblock_t));
+}
+
 /*
 ========================
 Z_Realloc - shp: copied from markv/quakespasm
@@ -272,9 +306,9 @@ void *Z_Realloc(void *ptr, int size)
 	void *old_ptr;
 	memblock_t *block;
 
-	printf("Z_Realloc: %p, %d", ptr, size);
+	printf("Z_Realloc: %p, %d\n", ptr, size);
 	if (!ptr)
-		return Z_Malloc (size);
+		return Z_NoZoneTagMalloc (size, 1);
 
 	printf("not a normal z_malloc\n");
 
@@ -288,10 +322,11 @@ void *Z_Realloc(void *ptr, int size)
 	old_size -= (4 + (int)sizeof(memblock_t));	/* see Z_TagMalloc() */
 	old_ptr = ptr;
 
-	Z_Free (ptr);
-	ptr = Z_TagMalloc (size, 1);
+	ptr = Z_NoZoneTagMalloc (size, 1);
 	if (!ptr)
+	{
 		Sys_Error ("Z_Realloc: failed on allocation of %d bytes", size);
+	}
 
 	if (ptr != old_ptr)
 	{
@@ -302,6 +337,8 @@ void *Z_Realloc(void *ptr, int size)
 	}
 	if (old_size < size)
 		memset ((byte *)ptr + old_size, 0, size - old_size);
+
+	Z_NoZoneTagFree(old_ptr);
 
 	return ptr;
 }
@@ -979,3 +1016,10 @@ void Memory_Init (void *buf, int size)
 	Z_ClearZone (mainzone, zonesize);
 }
 
+extern const char	**pr_knownstrings;
+void Memory_Cleanup (void)
+{
+	free(hunk_base);
+	if (pr_knownstrings)
+		Z_NoZoneTagFree(pr_knownstrings);
+}

@@ -955,5 +955,6 @@ void Host_Shutdown(void)
 	{
 		VID_Shutdown();
 	}
+	Memory_Cleanup();
 }
 

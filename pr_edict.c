@@ -33,7 +33,7 @@ int				pr_edict_size;	// in bytes
 
 // shp: 64 bit safe string stuff
 static	int			pr_stringssize;
-static	const char	**pr_knownstrings;
+const char	**pr_knownstrings = NULL;
 static	int			pr_maxknownstrings;
 static	int			pr_numknownstrings;
 //
@@ -1027,7 +1027,7 @@ void PR_LoadProgs (void)
 	pr_maxknownstrings = 0;
 	pr_stringssize = progs->numstrings;
 	if (pr_knownstrings)
-		Z_Free ((void *)pr_knownstrings);
+		Z_NoZoneTagFree(pr_knownstrings);
 	pr_knownstrings = NULL;
 	PR_SetEngineString("");
 	//
