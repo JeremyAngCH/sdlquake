@@ -134,7 +134,7 @@ void InsertLinkAfter (link_t *l, link_t *after)
 
 ============================================================================
 */
-
+#if 0
 void Q_memset (void *dest, int fill, int count)
 {
 	int             i;
@@ -422,6 +422,7 @@ float Q_atof (char *str)
 	
 	return val*sign;
 }
+#endif
 
 /*
 ============================================================================
