@@ -17,7 +17,7 @@ See `README.SDL` for the original porter's comments.
 Notes
 -----
 
-Currently plays demos at startup, but crashes when starting a new game on my x86-64 Linux system. Presumed to be some lingering 64-bit cleanness or uninitialized data issue. Investigating.
+Fixed some RISC-V compilation issues, bugs and mouse control issues.
 
 License
 -------
